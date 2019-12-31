@@ -53,6 +53,20 @@
             }
         }
     }
-
+    @media(max-width: 564px) {
+        .box {
+            height: 87vw;
+            width: 87vw;
+            padding: 0.9vw;
+            .block {
+                height: 21.2vw;
+                span {
+                    width: 19.5vw;
+                    height: 19.5vw;
+                    margin: 0.9vw;
+                }
+            }
+        }
+    }
 
 </style>

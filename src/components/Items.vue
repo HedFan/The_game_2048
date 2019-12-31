@@ -1,6 +1,7 @@
 <template>
     <div>
-        <div class="block-area">
+
+        <div v-touch:tap="tapTouch" v-touch:swipe="startGSwipe" class="block-area">
             <transition-group
                     tag="p"
                     name="nameList"
@@ -48,6 +49,10 @@
         },
 
         methods: {
+            tapTouch() {
+                if(this.startGame) this.createFirstEl();
+                if(this.finishGame) this.restartGame();
+            },
             restartGame() {
                 this.finishGame = false;
                 this.elements = [];
@@ -96,37 +101,54 @@
                 if (this.finishGame !== true && this.startGame !== true) {
                     switch (event.key) {
                         case 'ArrowRight':
-                            this.funcForStart(event.key);
+                            this.moveTile(event.key);
                             this.activeDir = 'X(';
                             break;
                         case 'ArrowLeft':
-                            this.funcForStart(event.key);
+                            this.moveTile(event.key);
                             this.activeDir = 'X(-';
                             break;
                         case 'ArrowUp':
-                            this.funcForStart(event.key);
+                            this.moveTile(event.key);
                             this.activeDir = 'Y(-';
                             break;
                         case 'ArrowDown':
-                            this.funcForStart(event.key);
+                            this.moveTile(event.key);
                             this.activeDir = 'Y(';
                             break;
                     }
                 }
             },
-            funcForStart(event) {
-                console.log(event);
-                this.moveTile(event);
-
+            startGSwipe(event) {
+                if (this.finishGame !== true && this.startGame !== true) {
+                    switch (event) {
+                        case 'right':
+                            this.moveTile(event);
+                            this.activeDir = 'X(';
+                            break;
+                        case 'left':
+                            this.moveTile(event);
+                            this.activeDir = 'X(-';
+                            break;
+                        case 'top':
+                           this.moveTile(event);
+                            this.activeDir = 'Y(-';
+                            break;
+                        case 'bottom':
+                            this.moveTile(event);
+                            this.activeDir = 'Y(';
+                            break;
+                    }
+                }
             },
 
             // move
             toMove(val, arr, dir) {
                 for (let v = 0; v < 4; v++) {
                     let elInd;
-                    if (val === 'ArrowDown' || val === 'ArrowRight') {
+                    if (val === 'ArrowDown' || val === 'ArrowRight' || val === 'right' || val === 'bottom') {
                         elInd = '' + (4 - v);
-                    } else if (val === 'ArrowLeft' || val === 'ArrowUp') {
+                    } else if (val === 'ArrowLeft' || val === 'ArrowUp' || val === 'left' || val === 'top') {
                         elInd = '' + (1 + v);
                     }
                     if (arr[v]) {
@@ -134,8 +156,6 @@
                         arr[v][dir] = dir + '-' + this.translationRev(elInd);
                         let indexOld = this.matrix.findIndex(el => el[0] === arr[v].x && el[1] === arr[v].y);
                         this.matrix.splice(indexOld, 1);
-
-
                     }
                 }
             },
@@ -156,8 +176,8 @@
             },
 
             moveTile(val) {
-                let fistVal = val === 'ArrowLeft' || val === 'ArrowRight' ? 'y' : 'x';
-                let secondVal = val === 'ArrowDown' || val === 'ArrowUp' ? 'y' : 'x';
+                let fistVal = val === 'ArrowLeft' || val === 'ArrowRight'|| val === 'right'|| val === 'left' ? 'y' : 'x';
+                let secondVal = val === 'ArrowDown' || val === 'ArrowUp' || val === 'top' || val === 'bottom' ? 'y' : 'x';
                 let stepY = 0, stepX = 0, permitForMove = false, arrVal = [];
 
                 switch (val) {
@@ -173,6 +193,18 @@
                     case 'ArrowUp':
                         stepY = -1;
                         break;
+                    case 'left':
+                        stepX = -1;
+                        break;
+                    case 'right':
+                        stepX = 1;
+                        break;
+                    case 'bottom':
+                        stepY = 1;
+                        break;
+                    case 'top':
+                        stepY = -1;
+                        break;
                 }
 
                 for (let q = 0; q < 4; q++) {
@@ -182,32 +214,31 @@
                     });
 
                     rar.sort((a, b) => {
-                        if (val === 'ArrowDown' || val === 'ArrowRight') {
+                        if (val === 'ArrowDown' || val === 'ArrowRight' || val === 'bottom' || val === 'right') {
                             return this.translation(b[secondVal]) - this.translation(a[secondVal])
-                        } else if (val === 'ArrowLeft' || val === 'ArrowUp') {
+                        } else if (val === 'ArrowLeft' || val === 'ArrowUp' || val === 'left' || val === 'top') {
                             return this.translation(a[secondVal]) - this.translation(b[secondVal])
                         }
                     });
 
                     this.toMerge(rar, arrVal);
-                        for (let v = 0; v < 4; v++) {
-                            let elInd;
-                            if (val === 'ArrowDown' || val === 'ArrowRight') {
-                                elInd = '' + (4 - v);
-                            } else if (val === 'ArrowLeft' || val === 'ArrowUp') {
-                                elInd = '' + (1 + v);
-                            }
-                            if (rar[v]) {
-                                permitForMove = this.matrix.some((item) => {
-                                    return this.translation(item[0]) === this.translation(rar[v].x) + stepX &&
-                                        this.translation(item[1]) === this.translation(rar[v].y) + stepY
-                                });
-                                if (permitForMove) arrVal.push(true)
-
-                            }
+                    for (let v = 0; v < 4; v++) {
+                        let elInd;
+                        if (val === 'ArrowDown' || val === 'ArrowRight' || val === 'bottom' || val === 'right') {
+                            elInd = '' + (4 - v);
+                        } else if (val === 'ArrowLeft' || val === 'ArrowUp' || val === 'left' || val === 'top') {
+                            elInd = '' + (1 + v);
                         }
-                    if (arrVal.length) this.toMove(val, rar, secondVal);
+                        if (rar[v]) {
+                            permitForMove = this.matrix.some((item) => {
+                                return this.translation(item[0]) === this.translation(rar[v].x) + stepX &&
+                                    this.translation(item[1]) === this.translation(rar[v].y) + stepY
+                            });
+                            if (permitForMove) arrVal.push(true)
 
+                        }
+                    }
+                    if (arrVal.length) this.toMove(val, rar, secondVal);
                 }
                 if (this.matrix.length === 0) this.finishGame = true;
                 if (arrVal.length) this.createNewEl();
@@ -403,7 +434,45 @@
             }
         }
     }
+    @media (max-width: 564px) {
+        .block-area span {
+            width: 19.5vw;
+            height: 19.5vw;
+            line-height: 19.5vw;
+            font-size: 8vw;
+            &.x-first {
+                left: 1.8vw;
+            }
 
+            &.x-second {
+                left: 23.1vw;
+            }
+
+            &.x-third {
+                left: 44.3vw;
+            }
+
+            &.x-fourth {
+                left: 65.6vw;
+            }
+
+            &.y-first {
+                top: 1.8vw;
+            }
+
+            &.y-second {
+                top: 23vw;
+            }
+
+            &.y-third {
+                top: 44.2vw;
+            }
+
+            &.y-fourth {
+                top: 65.4vw;
+            }
+        }
+    }
 
 </style>
 

@@ -13,7 +13,9 @@
     "core-js": "^2.6.5",
     "gulp": "^4.0.2",
     "map-stream": "0.0.7",
-    "vue": "^2.6.10"
+    "vue": "^2.6.10",
+    "vue-touch": "^2.0.0-beta.4",
+    "vue2-touch-events": "^2.1.0"
   },
   "devDependencies": {
     "@vue/cli-plugin-babel": "^3.8.0",
