@@ -16,7 +16,7 @@
     html, body {
         margin: 5px;
         padding: 0;
-        overflow-x: hidden;
+        overflow:hidden
     }
 
     ul {

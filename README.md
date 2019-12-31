@@ -1,5 +1,8 @@
 # The_game_2048
 
+
+[Start game](https://hedfan.github.io/The_game_2048/)
+
 ## Project setup
 ```
 npm install
